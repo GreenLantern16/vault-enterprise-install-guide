@@ -1,6 +1,9 @@
 # Vault Enterprise Install Guide
 This repo contains instructions and Terraform code for standing up HashiCorp Vault Enterprise in a reference architecture compliant configuration using the [Vault Enterprise Starter Module](https://github.com/hashicorp/terraform-aws-vault-ent-starter). It is designed to be as simple as possible to use and only requires you to adjust two variables.
 
+## Known Issues
+Due to an [issue with the Vault Starter module](https://github.com/hashicorp/terraform-aws-vault-ent-starter/issues/31) we are unable to create the VPC in the same run as the Vault cluster. The workaround for now is to comment out the module code in main.tf and output.tf, run terraform apply, uncomment the code and then run `terraform apply` again to complete the run. We will update this document once this issue has been fixed.
+
 ## Installation Guide
 Follow the steps below to create a produciton grade Vault Enterprise cluster on AWS.
 
@@ -25,6 +28,8 @@ aws ec2 import-key-pair --key-name scarolan --public-key-material fileb://~/.ssh
 ```
 
 ### Generate a LetsEncrypt TLS Certificate
+NOTE: If you already have your certificate, fullchain and privkey files from a previous build, you can reuse them as long as the cert has not expired. Or if a customer wants to provide their own TLS certs that's also fine, just make sure the names of the files match the configuration in tls.tf.
+
 For this step you'll need a domain name that you can add records to. For the purposes of this tutorial we'll use **vaultdemo.net** as an example. You must be either a domain administrator and able to receive admin emails about the domain or able to add records to the DNS files. This is what allows LetsEncrypt to validate your domain ownership.
 
 If you don't have it yet install the certbot command line tool:
