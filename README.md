@@ -2,7 +2,7 @@
 This repo contains instructions and Terraform code for standing up HashiCorp Vault Enterprise in a reference architecture compliant configuration using the [Vault Enterprise Starter Module](https://github.com/hashicorp/terraform-aws-vault-ent-starter). It is designed to be as simple as possible to use and only requires you to adjust three variables.
 
 ## How Does It Work?
-The code you'll find in this repo is broken into two parts, namely the VPC and the Vault cluster. The vpc code will stand up a basic network with the correct settings for a reference architecture Vault cluster in HA configuration. The terraform in the vault subdirectory uses the official Vault Enterprise Starter Module which takes care of the following automatically:
+The code you'll find in this repo is broken into two parts, namely the VPC and the Vault cluster. The VPC code will stand up a basic network with the correct settings for a reference architecture Vault cluster in HA configuration. The terraform in the vault subdirectory uses the official Vault Enterprise Starter Module which takes care of the following automatically:
 
 * Storage of TLS certificates in AWS Secrets Manager
 * Storage of Vault unseal keys in AWS KMS
@@ -15,12 +15,12 @@ Follow the steps below to create a production grade Vault Enterprise cluster on 
 
 ### Prerequisites
 * An AWS Account where you have admin rights. This guide assumes you are beginning with a fresh, empty AWS account. You can get an AWS lab account for eight hours using the [AWS Open Lab Instruqt](https://play.instruqt.com/hashicorp/tracks/aws-open-lab) track.
-* A VPC with three private subnets where you can place your Vault nodes. You can use the terraform in the included vpc subdirectory to create a suitable VPC with the correct tags and settings.
+* A VPC where you can deploy your Vault nodes. You can use the terraform in the included VPC subdirectory to create a suitable VPC with the correct tags and settings. See #vpc-setup below for the correct settings.
 * A domain name where you can add DNS records and to use for TLS certificates. HashiCorp SEs may use a subdomain of the hashidemos.com zone in the shared SE AWS account, [as documented in Confluence](https://hashicorp.atlassian.net/wiki/spaces/~844747070/pages/1018757599/Using+new+hashidemos.io+DNS+Zone). Some basic understanding of TLS is helpful for this part.
 * A local copy of both this repository and the [Terraform AWS Vault Enterprise Starter](https://github.com/hashicorp/terraform-aws-vault-ent-starter) module.
 
 ### Get the Code
-Clone the Vault Enterprise Starter repo and this Install Guide repo. You'll be doing all your work inside the vault-enterprise-install-guide repo, so you may wish to open that directory in your favorite text editor.
+Clone the Vault Enterprise Starter repo and this Install Guide repo. You'll be doing all your work inside the vault-enterprise-install-guide repo, so you may wish to open that directory in your favorite text editor. No changes are required to the starter module, but you'll need a local copy because it's not in the public registry yet.
 
 ```
 git clone https://github.com/scarolan/vault-enterprise-install-guide
@@ -31,22 +31,23 @@ git clone https://github.com/hashicorp/terraform-aws-vault-ent-starter
 Use the following commands to set up your AWS credentials. If you need an AWS account to build in, the [AWS Open Lab Instruqt track](https://play.instruqt.com/hashicorp/tracks/aws-open-lab/) will give you an environment for up to 8 hours.
 
 ```
-export AWS_REGION=us-west-2
+export AWS_REGION=us-east-1
 export AWS_ACCESS_KEY_ID=YOURACCESSKEY
 export AWS_SECRETACCESS_KEY=YOURSECRETKEY
 ```
 
 ### VPC Setup
-In order to use the Vault Enterprise Starter Module to install Vault you'll need a VPC that meets the following requirements:
+You'll need a VPC that meets the following requirements:
 
 * Three public subnets
 * Three NAT gateways, one in each public subnet
 * Three private subnets. Make sure your private subnets are tagged correctly so the Vault module can find them
 
-If you already have a VPC that meets these requirements you may move on to the next step. Otherwise use the terraform code in the vpc folder to build a new VPC. Only a single variable is required: `friendly_name_prefix`.
+If you already have a VPC that meets these requirements you may move on to the next step. Otherwise use the terraform code in the VPC folder to build a new VPC. Only a single variable is required: `friendly_name_prefix`.
 
 The tags for your Vault nodes can be changed by adjusting the `private_subnet_tags` variable. The default settings should be fine for most demos and POV trials.
 
+Run the terraform code inside of the vpc directory to build out the VPC:
 ```
 cd vpc
 terraform init
@@ -119,7 +120,7 @@ Terraform will use these three files to generate certificates that will be used 
 ### Configure Your Variables and Module Path
 Before you go further make sure you are in the **vault** subdirectory.
 
-Three variables are required; configure your terraform.tfvars file like so:
+Three variables are required; configure your terraform.tfvars file, replacing the variables with your own settings:
 
 ```
 friendly_name_prefix = "demo"
@@ -136,7 +137,7 @@ The only other edit required is on line 9 of main.tf. Update the source to the p
 ```
 
 ### Build the Vault Cluster
-Great, you're ready to build the cluster.
+Great, you're ready to build the cluster. Run these commands from within the **vault** subdirectory:
 
 ```
 terraform init
@@ -147,8 +148,6 @@ terraform apply -auto-approve
 If all goes well you should see output like the following:
 
 ```
-Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
-
 Outputs:
 
 leader_tls_servername = "vault.vaultdemo.net"
@@ -165,7 +164,7 @@ vault.vaultdemo.net  CNAME internal-demo-vault-lb-847388178.us-east-1.elb.amazon
 This essentially acts as a pointer to make sure requests for `vault.vaultdemo.net` get to the right internal load balancer.
 
 ### Enable Access to Vault
-For this step you can use the AWS console and manually add the networks or security groups that should be allowed to talk to Vault. Go into EC2 > Security Groups > demo-vault-lb-sg and add a Custom TCP rule allowing access to port 8200 from any of the entities that require access. For demo and POV purposes you may set this to `0.0.0.0/0` to keep things simple. Don't do this in production.
+For this step you can use the AWS console and manually add the networks or security groups that should be allowed to talk to Vault. Go into EC2 > Security Groups > demo-vault-lb-sg and add a Custom TCP rule allowing access to port 8200 from any of the entities that require access. For demo and POV purposes you may set this to `0.0.0.0/0` to keep things simple. **Don't do this in production.**
 
 ### Test Your Work
 If you don't have an application or bastion hosts stood up yet you can use one of the Vault nodes to check the API.
