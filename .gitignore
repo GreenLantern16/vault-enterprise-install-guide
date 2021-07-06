@@ -32,4 +32,4 @@ override.tf.json
 # Ignore *.pem files
 *.pem
 
-
+.terraform.lock.hcl
