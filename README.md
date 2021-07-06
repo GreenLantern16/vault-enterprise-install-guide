@@ -15,7 +15,7 @@ Follow the steps below to create a production grade Vault Enterprise cluster on 
 
 ### Prerequisites
 * An AWS Account where you have admin rights. This guide assumes you are beginning with a fresh, empty AWS account. You can get an AWS lab account for eight hours using the [AWS Open Lab Instruqt](https://play.instruqt.com/hashicorp/tracks/aws-open-lab) track.
-* A VPC where you can deploy your Vault nodes. You can use the terraform in the included VPC subdirectory to create a suitable VPC with the correct tags and settings. See #vpc-setup below for the correct settings.
+* A VPC where you can deploy your Vault nodes. You can use the terraform in the included VPC subdirectory to create a suitable VPC with the correct tags and settings. See [VPC Setup](#vpc-setup) below for the correct settings.
 * A domain name where you can add DNS records and to use for TLS certificates. HashiCorp SEs may use a subdomain of the hashidemos.com zone in the shared SE AWS account, [as documented in Confluence](https://hashicorp.atlassian.net/wiki/spaces/~844747070/pages/1018757599/Using+new+hashidemos.io+DNS+Zone). Some basic understanding of TLS is helpful for this part.
 * A local copy of both this repository and the [Terraform AWS Vault Enterprise Starter](https://github.com/hashicorp/terraform-aws-vault-ent-starter) module.
 
@@ -167,7 +167,7 @@ This essentially acts as a pointer to make sure requests for `vault.vaultdemo.ne
 For this step you can use the AWS console and manually add the networks or security groups that should be allowed to talk to Vault. Go into EC2 > Security Groups > demo-vault-lb-sg and add a Custom TCP rule allowing access to port 8200 from any of the entities that require access. For demo and POV purposes you may set this to `0.0.0.0/0` to keep things simple. **Don't do this in production.**
 
 ### Test Your Work
-If you don't have an application or bastion hosts stood up yet you can use one of the Vault nodes to check the API.
+If you don't have an application or bastion host stood up yet you can use one of the Vault nodes to check the API.
 
 Go into EC2 > Instances > Any Vault Instance > Connect to Instance.
 
