@@ -4,8 +4,8 @@ provider "aws" {
 
 module "vpc" {
   source                 = "terraform-aws-modules/vpc/aws"
-  version                = "3.0.0"
-  name                   = "${var.friendly_name_prefix}-vault"
+  version                = "3.7.0"
+  name                   = "${var.resource_name_prefix}-vault"
   cidr                   = var.vpc_cidr
   azs                    = var.azs
   enable_nat_gateway     = true

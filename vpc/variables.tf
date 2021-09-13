@@ -15,9 +15,9 @@ variable "azs" {
   ]
 }
 
-variable "friendly_name_prefix" {
-  description = "Prefix for resource names (e.g. \"prod\")"
-  type        = string
+variable "resource_name_prefix" {
+  description = "A human-resource prefix for your resources in AWS."
+  default     = "vault"
 }
 
 variable "vpc_cidr" {

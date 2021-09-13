@@ -1,5 +1,5 @@
 # Vault Enterprise Install Guide
-This repo contains instructions and Terraform code for standing up HashiCorp Vault Enterprise in a reference architecture compliant configuration using the [Vault Enterprise Starter Module](https://github.com/hashicorp/terraform-aws-vault-ent-starter). It is designed to be as simple as possible to use and only requires you to adjust three variables.
+This repo contains instructions and Terraform code for standing up HashiCorp Vault Enterprise in a reference architecture compliant configuration using the [Vault Enterprise Starter Module](https://github.com/hashicorp/terraform-aws-vault-ent-starter). It is designed to be as simple as possible to use and only requires you to adjust four variables.
 
 ## How Does It Work?
 The code you'll find in this repo is broken into two parts, namely the VPC and the Vault cluster. The VPC code will stand up a basic network with the correct settings for a reference architecture Vault cluster in HA configuration. The terraform in the vault subdirectory uses the official Vault Enterprise Starter Module which takes care of the following automatically:
@@ -14,21 +14,22 @@ The code you'll find in this repo is broken into two parts, namely the VPC and t
 Follow the steps below to create a production grade Vault Enterprise cluster on AWS.
 
 ### Prerequisites
-* An AWS Account where you have admin rights. This guide assumes you are beginning with a fresh, empty AWS account. You can get an AWS lab account for eight hours using the [AWS Open Lab Instruqt](https://play.instruqt.com/hashicorp/tracks/aws-open-lab) track.
+* An AWS Account where you have admin rights.
 * A VPC where you can deploy your Vault nodes. You can use the terraform in the included VPC subdirectory to create a suitable VPC with the correct tags and settings. See [VPC Setup](#vpc-setup) below for the correct settings.
 * A domain name where you can add DNS records and to use for TLS certificates. HashiCorp SEs may use a subdomain of the hashidemos.com zone in the shared SE AWS account, [as documented in Confluence](https://hashicorp.atlassian.net/wiki/spaces/~844747070/pages/1018757599/Using+new+hashidemos.io+DNS+Zone). Some basic understanding of TLS is helpful for this part.
-* A local copy of both this repository and the [Terraform AWS Vault Enterprise Starter](https://github.com/hashicorp/terraform-aws-vault-ent-starter) module.
+* A copy of this repository which utilizes the most excellent [Terraform AWS Vault Enterprise Starter](https://github.com/hashicorp/terraform-aws-vault-ent-starter) module.
+* Your Vault Enterprise `*.hclic` file. Ask your account representative or solutions engineer if you need a new license.
 
 ### Get the Code
-Clone the Vault Enterprise Starter repo and this Install Guide repo. You'll be doing all your work inside the vault-enterprise-install-guide repo, so you may wish to open that directory in your favorite text editor. No changes are required to the starter module, but you'll need a local copy because it's not in the public registry yet.
+Clone this Vault Enterprise Install Guide repo.
 
 ```
 git clone https://github.com/scarolan/vault-enterprise-install-guide
-git clone https://github.com/hashicorp/terraform-aws-vault-ent-starter
+cd vault-enterprise-install-guide
 ```
 
 ### AWS Account and Credentials Setup
-Use the following commands to set up your AWS credentials. If you need an AWS account to build in, the [AWS Open Lab Instruqt track](https://play.instruqt.com/hashicorp/tracks/aws-open-lab/) will give you an environment for up to 8 hours.
+Use the following commands to set up your AWS credentials. If you already have your credentials configured via the `aws configure` command that's fine too. **Don't ever put AWS credentials into your Terraform code.**
 
 ```
 export AWS_REGION=us-east-1
@@ -43,7 +44,7 @@ You'll need a VPC that meets the following requirements:
 * Three NAT gateways, one in each public subnet
 * Three private subnets. Make sure your private subnets are tagged correctly so the Vault module can find them
 
-If you already have a VPC that meets these requirements you may move on to the next step. Otherwise use the terraform code in the VPC folder to build a new VPC. Only a single variable is required: `friendly_name_prefix`.
+If you already have a VPC that meets these requirements you may move on to the next step. Otherwise use the terraform code in the VPC folder to build a new VPC. Only a single variable is required: `resource_name_prefix`.
 
 The tags for your Vault nodes can be changed by adjusting the `private_subnet_tags` variable. The default settings should be fine for most demos and POV trials.
 
@@ -68,19 +69,19 @@ vpc_id = "vpc-0cf321d42c7f72e13"
 Once you've succesfully built a VPC (or already have one prepared) proceed to the next step.
 
 ### Generate a LetsEncrypt TLS Certificate
-NOTE: If you already have your certificate, fullchain and privkey files from a previous build, you can reuse them as long as the cert has not expired. Or if a customer wants to provide their own TLS certs that's also fine, just make sure the names of the files match the configuration in `tls.tf`.
+NOTE: If you want to use pre-existing certificates just make sure the names of the files match the configuration in `tls.tf`.
 
 For this step you'll need a domain name that you can add records to. For the purposes of this tutorial we'll use **vaultdemo.net** as an example. You must be either a domain administrator and able to receive admin emails about the domain or able to add records to the DNS files. This is what allows LetsEncrypt to validate your domain ownership.
 
-If you don't have it yet install the certbot command line tool:
+If you don't have it yet install the [certbot command line tool](https://certbot.eff.org/). MacOS users can use the `brew` command to install. Linux or WSL users may install certbot using `apt` or the snap store.
 
-```
+```bash
 brew install certbot
 ```
 
 Next run the command to generate a new TLS cert:
 
-```
+```bash
 sudo certbot certonly --manual --preferred-challenges dns
 ```
 
@@ -120,21 +121,16 @@ Terraform will use these three files to generate certificates that will be used 
 ### Configure Your Variables and Module Path
 Before you go further make sure you are in the **vault** subdirectory.
 
-Three variables are required; configure your terraform.tfvars file, replacing the variables with your own settings:
+Three variables are required; configure your terraform.tfvars file, replacing the variables with your own settings. Make sure the `license_filepath` setting points at your local Vault license file. In this example we're storing it on the desktop:
 
 ```
-friendly_name_prefix = "demo"
+resource_name_prefix = "demo"
 shared_san = "vault.vaultdemo.net"
 vpc_id = "vpc-0cf321d42c7f72e13"
+license_filepath = "~/Desktop/vault.hclic"
 ```
 
-The only other edit required is on line 9 of main.tf. Update the source to the path where you cloned the Terraform Enterprise Vault Starter module.
-
-```
-  # Change this source to wherever you cloned the terraform-aws-vault-ent-starter module.
-  # This module is not in the public registry yet.
-  source               = "/Users/scarolan/git_repos/terraform-aws-vault-ent-starter"
-```
+That's it! You only need to configure these four variables to run the code in this repo.
 
 ### Build the Vault Cluster
 Great, you're ready to build the cluster. Run these commands from within the **vault** subdirectory:
