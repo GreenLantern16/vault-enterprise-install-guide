@@ -106,10 +106,6 @@ Key is saved at:         /etc/letsencrypt/live/vault.vaultdemo.net/privkey.pem
 Next, let's create base64 encoded versions of each file for Terraform to use. This requires you to have the `base64` command which is installed by default on MacOS and Linux. If you're using your own certificates simply replace the file paths below with the correct path to your three files (certificate authority, certificate, and private key).
 
 ```
-cd vault
-```
-
-```
 export TF_VAR_fullchain_b64=$(sudo base64 -i /etc/letsencrypt/live/vault.vaultdemo.net/fullchain.pem)
 export TF_VAR_cert_b64=$(sudo base64 -i /etc/letsencrypt/live/vault.vaultdemo.net/cert.pem)
 export TF_VAR_private_key_b64=$(sudo base64 -i /etc/letsencrypt/live/vault.vaultdemo.net/privkey.pem)
