@@ -203,8 +203,7 @@ HA Enabled               true
 ```
 
 ### Next Steps
-You may now initialize your Vault cluster and begin using it. Be sure to save a copy of the unseal key and root token somewhere save!
-
+You may now initialize your Vault cluster and begin using it. Be sure to save a copy of the unseal key and root token somewhere safe!
 
 ### TLS Certificate Renewal
 
