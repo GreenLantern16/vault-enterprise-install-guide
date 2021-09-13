@@ -165,7 +165,7 @@ vault.vaultdemo.net  CNAME internal-demo-vault-lb-847388178.us-east-1.elb.amazon
 This essentially acts as a pointer to make sure requests for `vault.vaultdemo.net` get to the right internal load balancer.
 
 ### Enable Access to Vault
-For this step you can use the AWS console and manually add the networks or security groups that should be allowed to talk to Vault. Go into EC2 > Security Groups > demo-vault-lb-sg and add a Custom TCP rule allowing access to port 8200 from any of the entities that require access. For demo and POV purposes you may set this to `0.0.0.0/0` to keep things simple. **Don't do this in production.**
+For this step you can use the AWS console and manually add the networks or security groups that should be allowed to talk to Vault. Go into EC2 > Security Groups > demo-vault-lb-sg and add a Custom TCP rule allowing access to port 8200 from any of the entities that require access. For demo or development purposes you may set this to `0.0.0.0/0` to keep things simple. **Don't do this in production.**
 
 ### Test Your Work
 If you don't have an application or bastion host stood up yet you can use one of the Vault nodes to check the API.
@@ -203,4 +203,9 @@ HA Enabled               true
 ```
 
 ### Next Steps
-From this point forward you can use this Vault cluster for a POV or demo. This repo can also be used inside a customer dev account for standing up a private trial or demo instance.
+You may now initialize your Vault cluster and begin using it. Be sure to save a copy of the unseal key and root token somewhere save!
+
+
+### TLS Certificate Renewal
+
+When it comes time to renew your TLS certificates, simply replace the old ones and re-run a `terraform apply`. Terraform will upload your new certificates into AWS secrets manager and reconfigure your ACM certificate for the load balancer. Then you can do a rolling upgrade by destroying one node at a time and allowing the auto-scaling group to re-deploy them with the new certs.
