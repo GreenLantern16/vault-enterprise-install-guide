@@ -73,7 +73,7 @@ vpc_id = "vpc-0cf321d42c7f72e13"
 Once you've succesfully built a VPC (or already have one prepared) proceed to the next step.
 
 ### Generate a LetsEncrypt TLS Certificate
-NOTE: If you want to use pre-existing certificates you can skip right to the `export` commands later in this section.
+NOTE: If you want to use pre-existing certificates you can skip right to the next section.
 
 For this step you'll need a domain name that you can add records to. For the purposes of this tutorial we'll use **vaultdemo.net** as an example. You must be either a domain administrator and able to receive admin emails about the domain or able to add records to the DNS files. This is what allows LetsEncrypt to validate your domain ownership.
 
@@ -93,7 +93,7 @@ Follow the instructions to create a new `TXT` record in your DNS provider. This 
 
 https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.vault.vaultdemo.net
 
-Once it's ready go ahead and finish provisioning your TLS certificate.
+Once it's ready go ahead and finish provisioning your CA, TLS certificate, and private key:
 
 Your brand new TLS cert and key will be stored in the following directories:
 ```
@@ -102,6 +102,7 @@ Certificate is saved at: /etc/letsencrypt/live/vault.vaultdemo.net/cert.pem
 Key is saved at:         /etc/letsencrypt/live/vault.vaultdemo.net/privkey.pem
 ```
 
+### Export Cert Files as Environment Variables
 Next, let's create base64 encoded versions of each file for Terraform to use. This requires you to have the `base64` command which is installed by default on MacOS and Linux. If you're using your own certificates simply replace the file paths below with the correct path to your three files (certificate authority, certificate, and private key).
 
 ```
@@ -114,7 +115,7 @@ export TF_VAR_cert_b64=$(sudo base64 -i /etc/letsencrypt/live/vault.vaultdemo.ne
 export TF_VAR_private_key_b64=$(sudo base64 -i /etc/letsencrypt/live/vault.vaultdemo.net/privkey.pem)
 ```
 
-Terraform will store these files in AWS secrets manager and deploy them to both the load balancer and each Vault instance.
+Terraform will store your certs in AWS secrets manager and deploy them to both the load balancer and each Vault instance.
 
 ### Configure Your Variables and Module Path
 Before you go further make sure you are in the **vault** subdirectory.
