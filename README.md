@@ -1,8 +1,8 @@
-# Vault Enterprise Install Guide
-This repo contains instructions and Terraform code for standing up HashiCorp Vault Enterprise in a reference architecture compliant configuration using the [Vault Enterprise Starter Module](https://github.com/hashicorp/terraform-aws-vault-ent-starter). It is designed to be as simple as possible to use and only requires you to adjust four variables.
+# Vault Enterprise Install Guide for AWS
+This repo contains instructions and Terraform code for standing up HashiCorp Vault Enterprise in a reference architecture compliant configuration using the [Vault Enterprise Starter Module](https://registry.terraform.io/modules/hashicorp/vault-ent-starter/aws/latest) for AWS. It is designed to be as simple as possible to use and only requires you to adjust four variables.
 
 ## How Does It Work?
-The code you'll find in this repo is broken into two parts, namely the VPC and the Vault cluster. The VPC code will stand up a basic network with the correct settings for a reference architecture Vault cluster in HA configuration. The terraform in the vault subdirectory uses the official Vault Enterprise Starter Module which takes care of the following automatically:
+The code you'll find in this repo is broken into two parts, namely the VPC and the Vault cluster. The VPC code will stand up a basic network with the correct settings for a reference architecture Vault cluster in HA configuration. The terraform in the vault subdirectory uses the official Vault Enterprise Starter Module for AWS which takes care of the following automatically:
 
 * Storage of TLS certificates in AWS Secrets Manager
 * Storage of Vault unseal keys in AWS KMS
