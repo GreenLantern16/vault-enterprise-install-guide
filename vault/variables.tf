@@ -4,11 +4,6 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
-variable "friendly_name_prefix" {
-  description = "Prefix for resource names (e.g. \"prod\")"
-  type        = string
-}
-
 # TLS and secrets manager variables
 variable "kms_key_id" {
   type        = string
@@ -47,4 +42,14 @@ variable "private_subnet_tags" {
   default = {
     Vault = "deploy"
   }
+}
+
+variable "license_filepath" {
+  description = "Local path to your Vault license `.hclic` file."
+  default     = "vault.hclic"
+}
+
+variable "resource_name_prefix" {
+  description = "A human-resource prefix for your resources in AWS."
+  default     = "vault"
 }
