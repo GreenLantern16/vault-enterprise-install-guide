@@ -73,7 +73,7 @@ vpc_id = "vpc-0cf321d42c7f72e13"
 Once you've succesfully built a VPC (or already have one prepared) proceed to the next step.
 
 ### Generate a LetsEncrypt TLS Certificate
-NOTE: If you want to use pre-existing certificates you can skip right to the next section.
+NOTE: If you want to use pre-existing certificates you can skip right to the [next section](#export-cert-files-as-environment-variables).
 
 For this step you'll need a domain name that you can add records to. For the purposes of this tutorial we'll use **vaultdemo.net** as an example. You must be either a domain administrator and able to receive admin emails about the domain or able to add records to the DNS files. This is what allows LetsEncrypt to validate your domain ownership.
 
