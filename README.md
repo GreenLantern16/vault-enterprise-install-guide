@@ -1,13 +1,14 @@
 # Vault Enterprise Install Guide for AWS
-This repo contains instructions and Terraform code for standing up HashiCorp Vault Enterprise in a reference architecture compliant configuration using the [Vault Enterprise Starter Module](https://registry.terraform.io/modules/hashicorp/vault-ent-starter/aws/latest) for AWS. It is designed to be as simple as possible to use and only requires you to adjust four variables.
+This repo contains instructions and Terraform code for standing up HashiCorp Vault Enterprise in a reference architecture compliant configuration using the [Vault Enterprise Starter Module](https://registry.terraform.io/modules/hashicorp/vault-ent-starter/aws/latest) for AWS. It is designed to be as simple as possible to use and only requires you to adjust five variables.
 
 ## How Does It Work?
 The code you'll find in this repo is broken into two parts, namely the VPC and the Vault cluster. The VPC code will stand up a basic network with the correct settings for a reference architecture Vault cluster in HA configuration. The terraform in the vault subdirectory uses the official Vault Enterprise Starter Module for AWS which takes care of the following automatically:
 
 * Storage of TLS certificates in AWS Secrets Manager
 * Storage of Vault unseal keys in AWS KMS
+* Storage of your Vault license in a private S3 bucket
 * A five node, HA enabled Vault cluster spread across three availability zones using Raft storage
-* An AWS internal load balancer that uses the TLS cert
+* An AWS internal load balancer that uses a TLS cert with your own domain name
 * Copies of the TLS certificate are also placed onto each Vault node for internal communication
 
 ## Installation Guide
@@ -16,7 +17,7 @@ Follow the steps below to create a production grade Vault Enterprise cluster on 
 ### Prerequisites
 * An AWS Account where you have admin rights.
 * A VPC where you can deploy your Vault nodes. You can use the terraform in the included VPC subdirectory to create a suitable VPC with the correct tags and settings. See [VPC Setup](#vpc-setup) below for the correct settings.
-* A domain name where you can add DNS records and to use for TLS certificates. HashiCorp SEs may use a subdomain of the hashidemos.com zone in the shared SE AWS account, [as documented in Confluence](https://hashicorp.atlassian.net/wiki/spaces/~844747070/pages/1018757599/Using+new+hashidemos.io+DNS+Zone). Some basic understanding of TLS is helpful for this part.
+* A domain name where you can add DNS records and to use for TLS certificates. Some basic understanding of TLS is helpful for this part.
 * A copy of this repository which utilizes the most excellent [Terraform AWS Vault Enterprise Starter](https://github.com/hashicorp/terraform-aws-vault-ent-starter) module.
 * Your Vault Enterprise `*.hclic` file. Ask your account representative or solutions engineer if you need a new license.
 
@@ -46,9 +47,12 @@ You'll need a VPC that meets the following requirements:
 
 If you already have a VPC that meets these requirements you may move on to the next step. Otherwise use the terraform code in the VPC folder to build a new VPC. Only a single variable is required: `resource_name_prefix`.
 
-The tags for your Vault nodes can be changed by adjusting the `private_subnet_tags` variable. The default settings should be fine for most demos and POV trials.
+The tags for your Vault nodes can be changed by adjusting the `private_subnet_tags` variable. The default settings should be fine for dev and test environments.
 
-Run the terraform code inside of the vpc directory to build out the VPC:
+Run the terraform code inside of the vpc directory to build out the VPC.
+
+Note: You can change the `region` and `azs` variables if you'd like to build your VPC in another region than the default of us-east-1.
+
 ```
 cd vpc
 terraform init
@@ -121,16 +125,17 @@ Terraform will use these three files to generate certificates that will be used 
 ### Configure Your Variables and Module Path
 Before you go further make sure you are in the **vault** subdirectory.
 
-Three variables are required; configure your terraform.tfvars file, replacing the variables with your own settings. Make sure the `license_filepath` setting points at your local Vault license file. In this example we're storing it on the desktop:
+Five variables are required; configure your terraform.tfvars file, replacing the variables with your own settings. Make sure the `license_filepath` setting points at your local Vault license file. In this example we're storing it on the desktop:
 
 ```
 resource_name_prefix = "demo"
 shared_san = "vault.vaultdemo.net"
 vpc_id = "vpc-0cf321d42c7f72e13"
 license_filepath = "~/Desktop/vault.hclic"
+region = "us-east-1"
 ```
 
-That's it! You only need to configure these four variables to run the code in this repo.
+That's it! You only need to configure these five variables to run the code in this repo.
 
 ### Build the Vault Cluster
 Great, you're ready to build the cluster. Run these commands from within the **vault** subdirectory:
