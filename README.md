@@ -197,4 +197,4 @@ HA Enabled               true
 You may now initialize your Vault cluster and begin using it. Be sure to save a copy of the unseal key and root token somewhere safe!
 
 ### TLS Certificate Renewal
-When it comes time to renew your TLS certificates, simply replace the old ones and re-run a `terraform apply`. Terraform will upload your new certificates into AWS secrets manager and reconfigure your ACM certificate for the load balancer. Then you can do a rolling upgrade by destroying one node at a time and allowing the auto-scaling group to re-deploy them with the new certs.
+When it comes time to renew your TLS certificates, simply replace the old ones and re-run a `terraform apply`. Terraform will upload your new certificates into AWS secrets manager and reconfigure your ACM certificate for the load balancer. Then you can do a rolling upgrade by destroying one node at a time and allowing the auto-scaling group to re-deploy them with the new certs. If you wish to automate the cert renewal process you can use the Terraform [ACME Provider](https://registry.terraform.io/providers/vancluever/acme/latest/docs).
