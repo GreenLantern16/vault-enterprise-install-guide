@@ -53,3 +53,15 @@ variable "resource_name_prefix" {
   description = "A human-resource prefix for your resources in AWS."
   default     = "vault"
 }
+
+variable "fullchain_b64" {
+  description = "Base64 encoded version of the CA (fullchain) certificate."
+}
+
+variable "cert_b64" {
+  description = "Base64 encoded version of the certificate."
+}
+
+variable "private_key_b64" {
+  description = "Base64 encoded version of the private_key."
+}

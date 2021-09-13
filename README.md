@@ -102,16 +102,16 @@ Certificate is saved at: /etc/letsencrypt/live/vault.vaultdemo.net/cert.pem
 Key is saved at:         /etc/letsencrypt/live/vault.vaultdemo.net/privkey.pem
 ```
 
-Next, copy the three files into the vault subdirectory of this repo. Example:
+Next, let's create base64 encoded versions of each file for Terraform to use. This requires you to have the `base64` command which is installed by default on MacOS and Linux:
 
 ```
 cd vault
 ```
 
 ```
-sudo cp /etc/letsencrypt/live/vault.vaultdemo.net/fullchain.pem .
-sudo cp /etc/letsencrypt/live/vault.vaultdemo.net/cert.pem .
-sudo cp /etc/letsencrypt/live/vault.vaultdemo.net/privkey.pem .
+export TF_VAR_fullchain_b64=$(sudo base64 -i /etc/letsencrypt/live/vault.vaultdemo.net/fullchain.pem)
+export TF_VAR_cert_b64=$(sudo base64 -i /etc/letsencrypt/live/vault.vaultdemo.net/cert.pem)
+export TF_VAR_private_key_b64=$(sudo base64 -i /etc/letsencrypt/live/vault.vaultdemo.net/privkey.pem)
 ```
 
 You'll also need to change the permissions on the privkey.pem file to be readable by Terraform:
@@ -206,5 +206,4 @@ HA Enabled               true
 You may now initialize your Vault cluster and begin using it. Be sure to save a copy of the unseal key and root token somewhere safe!
 
 ### TLS Certificate Renewal
-
 When it comes time to renew your TLS certificates, simply replace the old ones and re-run a `terraform apply`. Terraform will upload your new certificates into AWS secrets manager and reconfigure your ACM certificate for the load balancer. Then you can do a rolling upgrade by destroying one node at a time and allowing the auto-scaling group to re-deploy them with the new certs.

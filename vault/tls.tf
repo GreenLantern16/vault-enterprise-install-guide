@@ -2,9 +2,9 @@
 # files into the local directory alongside the terraform files, or this will fail.
 locals {
   tls_data = {
-    vault_ca   = base64encode(file("./fullchain.pem"))
-    vault_cert = base64encode(file("./cert.pem"))
-    vault_pk   = base64encode(file("./privkey.pem"))
+    vault_ca   = var.fullchain_b64
+    vault_cert = var.cert_b64
+    vault_pk   = var.private_key_b64
   }
 }
 
